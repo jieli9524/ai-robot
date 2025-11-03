@@ -1,0 +1,17 @@
+server:
+  port: 8080 # ??????
+
+
+spring:
+  ai:
+    zhipuai:
+      api-key: dddb21f9b5ee48eba92b81b8c7430232.ldG4BuqXbY8hxqpG
+      base-url: https://open.bigmodel.cn/api/paas
+      chat:
+        options:
+          model: GLM-4.5-Flash
+          temperature: 0.8 # ???
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
