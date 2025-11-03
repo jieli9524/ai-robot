@@ -4,6 +4,7 @@ package com.ai.airobot.controller;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +23,7 @@ public class ChatClientController {
      * @return
      */
 //    @GetMapping("/generate")
-    @GetMapping(value = "/generateStream", produces = "text/html;charset=utf-8")
+    @GetMapping(value = "/generateStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> generate(@RequestParam(value = "message", defaultValue = "你是谁？") String message,
                                  @RequestParam(value = "chatId") String chatId) {
         // 一次性返回结果
