@@ -6,7 +6,9 @@ import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,8 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/v2/ai")
 public class ChatClientController {
     @Resource
+    private ZhiPuAiChatModel chatModel;
+    @Resource
     private ChatClient chatClient;
 
     /**
@@ -25,28 +29,34 @@ public class ChatClientController {
      * @param message
      * @return
      */
-//    @GetMapping("/generate")
+
     @GetMapping(value = "/generateStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<AiResponse> generate(@RequestParam(value = "message", defaultValue = "你是谁？") String message,
-                                     @RequestParam(value = "chatId") String chatId) {
+    public Flux<AiResponse> generateStream(@RequestParam(value = "message", defaultValue = "你是谁？") String message) {
+        // 构建提示词
+        Prompt prompt = new Prompt(new UserMessage(message));
 
-        return chatClient.prompt()
-                .user(message)
-                //为当前聊天请求绑定一个会话 ID
-                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
-                .stream()
-                .content()
-                .map(content -> AiResponse.builder().v(content).build());
+        // 流式输出
+        return chatModel.stream(prompt)
+                .filter(chatResponse -> chatResponse.getResult() != null)
+                .mapNotNull(chatResponse -> {
+                    Generation generation = chatResponse.getResult();
+                    String text = generation.getOutput().getText();
+                    if (text != null && !text.isEmpty()) {
+                        return AiResponse.builder().v(text).build();
+                    }
+                    return null;
+                })
+                .filter(aiResponse -> aiResponse != null && aiResponse.getV() != null && !aiResponse.getV().isEmpty());
 
-                    // 构建提示词
-            //    Prompt prompt = new Prompt(new UserMessage(message));
-            //
-            //    // 流式输出
-        //        return chatModel.stream(prompt)
-        //            .mapNotNull(chatResponse -> {
-        //        Generation generation = chatResponse.getResult();
-        //        String text = generation.getOutput().getText();
-        //        return AIResponse.builder().v(text).build();
+
+
+//        return chatModel.stream(prompt)
+//                .mapNotNull(chatResponse -> {
+//                    Generation generation = chatResponse.getResult();
+//                    String text = generation.getOutput().getText();
+//                    return AiResponse.builder().v(text).build();
+//                });
+
     }
 
 
