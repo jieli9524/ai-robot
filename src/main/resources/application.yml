@@ -3,7 +3,36 @@ server:
 
 
 spring:
+  datasource:
+#    driver-class-name: org.postgresql.Driver # 数据库驱动类名
+#    url: jdbc:postgresql://localhost:5432/airobot # 数据库连接 URL
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver # 数据库驱动类名
+    url: jdbc:p6spy:postgresql://localhost:5432/airobot # 数据库连接 URL
+    username: postgres # 数据库用户名
+    password: postgres # 数据库密码
+    hikari: # HikariCP 连接池配置
+      pool-name: AI-Robot-HikariCP # 自定义连接池名称
+      auto-commit: true # 是否自动提交事务
+      connection-timeout: 30000 # 连接超时时间（毫秒）
+      idle-timeout: 600000 # 空闲连接存活最大时间（毫秒）
+      max-lifetime: 1800000 # 连接最大存活时间（毫秒）
+      minimum-idle: 5 # 最小空闲连接数
+      maximum-pool-size: 20 # 最大连接池大小
+      connection-test-query: SELECT 1 # 连接测试查询
+      validation-timeout: 5000 # 验证连接的有效性
   ai:
+    mcp:
+      client:
+#        type: sync # 客户端使用同步通信模式
+#        request-timeout: 20s # 设置单次请求超时时间
+#        sse: # SSE (Server-Sent Events) 流式响应配置
+#          connections: # 定义 SSE 连接端点
+#            qq-mcp-server: # 自定义连接名称（可任意命名）
+#              url: http://localhost:8000 # MCP 服务实际地址
+        stdio:
+          servers-configuration: classpath:/mcp-servers-config.json # 指定 MCP 服务的配置文件路径
+        toolcallback:
+          enabled: true # 开启 MCP 客户端的工具回调（Tool Callback）功能
     zhipuai:
       api-key: dddb21f9b5ee48eba92b81b8c7430232.ldG4BuqXbY8hxqpG
       base-url: https://open.bigmodel.cn/api/paas

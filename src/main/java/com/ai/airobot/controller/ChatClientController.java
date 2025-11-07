@@ -4,6 +4,10 @@ package com.ai.airobot.controller;
 import com.ai.airobot.model.AiResponse;
 import com.ai.airobot.tools.DateTimeTools;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -46,11 +50,21 @@ public class ChatClientController {
     @GetMapping(value = "/generateModel", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<AiResponse> generateStream(@RequestParam(value = "message", defaultValue = "你是谁？") String message,
                                            @RequestParam(value = "lang") String lang) {
+//        // 将 DateTimeTools 注册到工具集中
+//        ToolCallback[] tools = ToolCallbacks.from(new DateTimeTools());
+//
+//        // 构建聊天选项配置，设置工具回调功能
+//        ChatOptions chatOptions = ToolCallingChatOptions.builder()
+//                .toolCallbacks(tools)
+//                .build();
+//        Prompt prompt = new Prompt(new UserMessage(message), chatOptions);
+
         // 构建提示词
         PromptTemplate promptTemplate = new PromptTemplate(templateResource);
 
         // 填充提示词占位符，转换为 Prompt 提示词对象
         Prompt prompt = promptTemplate.create(Map.of("description", message, "lang", lang));
+
 
 
         // 流式输出
