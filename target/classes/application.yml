@@ -41,6 +41,9 @@ spring:
           model: GLM-4.5-Flash
           temperature: 0.8 # ???
 
+#logging:
+#  level:
+#    org.springframework.ai.chat.client.advisor: debug
+
 logging:
-  level:
-    org.springframework.ai.chat.client.advisor: debug
+  config: classpath:log4j2.xml # 设置日志配置文件路径
